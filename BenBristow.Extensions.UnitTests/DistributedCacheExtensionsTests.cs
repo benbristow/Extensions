@@ -8,7 +8,7 @@ public class DistributedCacheExtensionsTests
     private readonly Mock<IDistributedCache> _cacheMock = new();
 
     [Fact]
-    public async Task GetOrCreateAsync_ItemNotInCache_CreatesAndCachesItem()
+    public async Task GetOrSetAsync_ItemNotInCache_CreatesAndCachesItem()
     {
         // Arrange
         const string key = "testKey";
@@ -17,7 +17,7 @@ public class DistributedCacheExtensionsTests
         _cacheMock.Setup(c => c.SetAsync(key, It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act
-        var result = await _cacheMock.Object.GetOrCreateAsync(key, _ => Task.FromResult(expectedItem));
+        var result = await _cacheMock.Object.GetOrSetAsync(key, _ => Task.FromResult(expectedItem));
 
         // Assert
         Assert.Equal(expectedItem.Value, result.Value);
@@ -26,7 +26,7 @@ public class DistributedCacheExtensionsTests
     }
 
     [Fact]
-    public async Task GetOrCreateAsync_ItemInCache_ReturnsCachedItem()
+    public async Task GetOrSetAsync_ItemInCache_ReturnsCachedItem()
     {
         // Arrange
         const string key = "testKey";
@@ -35,7 +35,7 @@ public class DistributedCacheExtensionsTests
         _cacheMock.Setup(c => c.GetAsync(key, It.IsAny<CancellationToken>())).ReturnsAsync(cachedBytes);
 
         // Act
-        var result = await _cacheMock.Object.GetOrCreateAsync(key, _ => Task.FromResult(new TestItem { Value = "new" }));
+        var result = await _cacheMock.Object.GetOrSetAsync(key, _ => Task.FromResult(new TestItem { Value = "new" }));
 
         // Assert
         Assert.Equal(cachedItem.Value, result.Value);
@@ -44,7 +44,7 @@ public class DistributedCacheExtensionsTests
     }
 
     [Fact]
-    public async Task GetOrCreateAsync_WithExpiry_SetsExpiryOption()
+    public async Task GetOrSetAsync_WithExpiry_SetsExpiryOption()
     {
         // Arrange
         const string key = "testKey";
@@ -54,7 +54,7 @@ public class DistributedCacheExtensionsTests
         _cacheMock.Setup(c => c.SetAsync(key, It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act
-        var result = await _cacheMock.Object.GetOrCreateAsync(key, _ => Task.FromResult(expectedItem), expiry);
+        var result = await _cacheMock.Object.GetOrSetAsync(key, _ => Task.FromResult(expectedItem), expiry);
 
         // Assert
         Assert.Equal(expectedItem.Value, result.Value);
@@ -62,7 +62,7 @@ public class DistributedCacheExtensionsTests
     }
 
     [Fact]
-    public async Task GetOrCreateAsync_WithCancellationToken_PassesToken()
+    public async Task GetOrSetAsync_WithCancellationToken_PassesToken()
     {
         // Arrange
         const string key = "testKey";
@@ -72,7 +72,7 @@ public class DistributedCacheExtensionsTests
         _cacheMock.Setup(c => c.SetAsync(key, It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), cts.Token)).Returns(Task.CompletedTask);
 
         // Act
-        var result = await _cacheMock.Object.GetOrCreateAsync(key, _ => Task.FromResult(expectedItem), cancellationToken: cts.Token);
+        var result = await _cacheMock.Object.GetOrSetAsync(key, _ => Task.FromResult(expectedItem), cancellationToken: cts.Token);
 
         // Assert
         Assert.Equal(expectedItem.Value, result.Value);
@@ -81,7 +81,7 @@ public class DistributedCacheExtensionsTests
     }
 
     [Fact]
-    public async Task GetOrCreateAsync_DeserializationFails_ThrowsException()
+    public async Task GetOrSetAsync_DeserializationFails_ThrowsException()
     {
         // Arrange
         const string key = "testKey";
@@ -89,7 +89,7 @@ public class DistributedCacheExtensionsTests
         _cacheMock.Setup(c => c.GetAsync(key, It.IsAny<CancellationToken>())).ReturnsAsync(invalidBytes);
 
         // Act & Assert
-        await Assert.ThrowsAsync<JsonException>(() => _cacheMock.Object.GetOrCreateAsync<TestItem>(key, _ => Task.FromResult(new TestItem())));
+        await Assert.ThrowsAsync<JsonException>(() => _cacheMock.Object.GetOrSetAsync<TestItem>(key, _ => Task.FromResult(new TestItem())));
     }
 
     private class TestItem

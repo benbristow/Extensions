@@ -18,7 +18,8 @@ public static class DistributedCacheExtensions
     /// <param name="expiry">Optional absolute expiration time relative to now.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A task representing the cached or newly created item.</returns>
-    public static async Task<T> GetOrCreateAsync<T>(this IDistributedCache cache, string key, Func<CancellationToken, Task<T>> createItem, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
+    /// <exception cref="InvalidOperationException">Thrown when deserialization of the cached item fails.</exception>
+    public static async Task<T> GetOrSetAsync<T>(this IDistributedCache cache, string key, Func<CancellationToken, Task<T>> createItem, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
     {
         var bytes = await cache.GetAsync(key, cancellationToken);
         T item;
