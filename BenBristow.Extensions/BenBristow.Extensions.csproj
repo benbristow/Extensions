@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -9,16 +9,20 @@
         <Title>BenBristow.Extensions</Title>
         <Authors>Ben Bristow</Authors>
         <Description>Collection of common, useful extension methods</Description>
-        <Copyright>Copyright (c) 2024 Ben Bristow</Copyright>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) 2025 Ben Bristow</Copyright>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/benbristow/Extensions</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <LangVersion>default</LangVersion>
-        <Version>1.0.11</Version>
-    </PropertyGroup>
+        <Version>1.1.0</Version>
+        </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="..\README.md" Pack="true" PackagePath="\"/>
-    </ItemGroup>
+        <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        </ItemGroup>
 
-</Project>
+        <ItemGroup>
+          <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.1" />
+        </ItemGroup>
+
+    </Project>

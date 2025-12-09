@@ -2,6 +2,9 @@ using System.ComponentModel;
 
 namespace BenBristow.Extensions;
 
+/// <summary>
+/// Provides extension methods for enum types.
+/// </summary>
 public static class EnumExtensions
 {
     /// <summary>

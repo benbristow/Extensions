@@ -6,6 +6,22 @@ namespace BenBristow.Extensions.Attributes;
 ///     Validation attribute to ensure that a date property is after another specified date property.
 ///     Supports DateTime, DateTimeOffset, and DateOnly types, including their nullable versions.
 /// </summary>
+/// <remarks>
+///     This attribute validates that the decorated property's date value is chronologically after
+///     the date value of the specified comparison property. Both properties must be of compatible
+///     date types (DateTime, DateTimeOffset, or DateOnly), including their nullable versions.
+/// </remarks>
+/// <example>
+///     <code>
+///     public class Event
+///     {
+///         public DateTime StartDate { get; set; }
+///         
+///         [MustBeAfter(nameof(StartDate))]
+///         public DateTime EndDate { get; set; }
+///     }
+///     </code>
+/// </example>
 public sealed class MustBeAfterAttribute : ValidationAttribute
 {
     private readonly string _comparisonPropertyName;
@@ -14,6 +30,7 @@ public sealed class MustBeAfterAttribute : ValidationAttribute
     ///     Initializes a new instance of the <see cref="MustBeAfterAttribute" /> class.
     /// </summary>
     /// <param name="comparisonPropertyName">The name of the property to compare against.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="comparisonPropertyName"/> is null or empty.</exception>
     public MustBeAfterAttribute(string comparisonPropertyName)
     {
         _comparisonPropertyName = comparisonPropertyName;
@@ -29,6 +46,20 @@ public sealed class MustBeAfterAttribute : ValidationAttribute
     ///     It will be <see cref="ValidationResult.Success" /> if the validation succeeds;
     ///     otherwise, an instance of <see cref="ValidationResult" /> with an error message.
     /// </returns>
+    /// <remarks>
+    ///     The validation succeeds in the following cases:
+    ///     <list type="bullet">
+    ///         <item><description>Both values are null</description></item>
+    ///         <item><description>The current property's value is chronologically after the comparison property's value</description></item>
+    ///     </list>
+    ///     The validation fails when:
+    ///     <list type="bullet">
+    ///         <item><description>The comparison property does not exist</description></item>
+    ///         <item><description>One value is null and the other is not</description></item>
+    ///         <item><description>The current property's value is not after the comparison property's value</description></item>
+    ///         <item><description>Either value is of an unsupported date type</description></item>
+    ///     </list>
+    /// </remarks>
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         var property = validationContext.ObjectType.GetProperty(_comparisonPropertyName);
@@ -58,6 +89,14 @@ public sealed class MustBeAfterAttribute : ValidationAttribute
     /// <param name="value">The value to convert.</param>
     /// <returns>A DateTimeOffset representation of the value.</returns>
     /// <exception cref="ArgumentException">Thrown when the value is not a supported date type.</exception>
+    /// <remarks>
+    ///     Supported types include:
+    ///     <list type="bullet">
+    ///         <item><description><see cref="DateTime"/> - Converted to DateTimeOffset using the DateTime's Kind property</description></item>
+    ///         <item><description><see cref="DateTimeOffset"/> - Returned as-is</description></item>
+    ///         <item><description><see cref="DateOnly"/> - Converted to DateTimeOffset with time set to midnight</description></item>
+    ///     </list>
+    /// </remarks>
     private static DateTimeOffset GetDateTimeOffset(object? value) => value switch
     {
         DateTime dateTime => new DateTimeOffset(dateTime),

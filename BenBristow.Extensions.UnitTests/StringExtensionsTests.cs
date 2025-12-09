@@ -22,7 +22,7 @@ public sealed class StringExtensionsTests
     public void HashSHA512_GivenString_ShouldReturnExpectedHash(string input, string expected)
     {
         // Act
-        var result = input.HashSHA512();
+        var result = input.HashSha512();
 
         // Assert
         result.Should().Be(expected);
